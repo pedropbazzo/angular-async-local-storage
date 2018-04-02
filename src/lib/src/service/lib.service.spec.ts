@@ -1,6 +1,7 @@
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/toPromise';
 
 import { AsyncLocalStorage } from './lib.service';
 import { IndexedDBDatabase } from './databases/indexeddb-database';
