@@ -8,12 +8,12 @@ export function asyncLocalStorageFactory(platformId: Object) {
 
     let database: AsyncLocalDatabase;
 
-    if (isPlatformBrowser(platformId) && ('indexedDB' in window)) {
+    if (isPlatformBrowser(platformId) && ('indexedDB' in window) && (indexedDB !== undefined) && (indexedDB !== null)) {
 
       /* Try with IndexedDB in modern browsers */
       database = new IndexedDBDatabase();
 
-    } else if (isPlatformBrowser(platformId) && ('localStorage' in window)) {
+    } else if (isPlatformBrowser(platformId) && ('localStorage' in window) && (localStorage !== undefined) && (localStorage !== null)) {
 
       /* Try with localStorage in old browsers (IE9) */
       database = new LocalStorageDatabase();

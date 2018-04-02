@@ -71,7 +71,7 @@ export class IndexedDBDatabase extends AsyncLocalDatabase {
             /* Merging success and errors events and autoclosing the observable */
             return Observable.merge(success, this.toErrorObservable(request, `getter`)).first();
 
-        });
+        }).first();
 
     }
 
@@ -86,7 +86,7 @@ export class IndexedDBDatabase extends AsyncLocalDatabase {
         /* Storing null is not correctly supported by IndexedDB and unnecessary here */
         if (data == null) {
 
-            return Observable.of(true);
+            return Observable.of(true).first();
 
         }
 
@@ -114,7 +114,7 @@ export class IndexedDBDatabase extends AsyncLocalDatabase {
 
             });
 
-        });
+        }).first();
 
     }
 
@@ -147,7 +147,7 @@ export class IndexedDBDatabase extends AsyncLocalDatabase {
             /* Passing true if the item does not exist in local storage */
             return Observable.of(true).first();
 
-        });
+        }).first();
 
     }
 
@@ -166,7 +166,7 @@ export class IndexedDBDatabase extends AsyncLocalDatabase {
             /* Merging success (passing true) and error events and autoclosing the observable */
             return Observable.merge(this.toSuccessObservable(request), this.toErrorObservable(request, `clearer`)).first();
 
-        });
+        }).first();
 
     }
 
@@ -203,6 +203,8 @@ export class IndexedDBDatabase extends AsyncLocalDatabase {
                 /* Storing the database connection for further access */
                 this.database.next((event.target as IDBRequest).result as IDBDatabase);
 
+        }, (error) => {
+          this.database.error(error as Error);
         });
 
     }

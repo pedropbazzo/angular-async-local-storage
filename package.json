@@ -1,6 +1,6 @@
 {
   "name": "angular-async-local-storage",
-  "version": "2.0.1",
+  "version": "4.0.0",
   "description": "Efficient local storage module for Angular : simple API based on native localStorage API, but internally stored via the asynchronous IndexedDB API for performance, and wrapped in RxJS observables to be homogeneous with other Angular modules.",
   "main": "./bundles/angular-async-local-storage.umd.js",
   "module": "./angular-async-local-storage.es5.js",
@@ -48,7 +48,8 @@
     "integration:jit": "cd integration && npm run e2e",
     "integration:aot": "cd integration && npm run e2e:aot",
     "lint": "tslint ./src/**/*.ts -t verbose",
-    "release": "standard-version"
+    "release": "standard-version",
+    "reinstall": "rimraf node_modules && npm install"
   },
   "peerDependencies": {
     "@angular/core": ">=4.0.0 <5.0.0",
