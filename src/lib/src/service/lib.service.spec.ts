@@ -1,7 +1,11 @@
-import { TestBed, inject, async } from '@angular/core/testing';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/take';
 
 import { AsyncLocalStorage } from './lib.service';
-import { IndexedDBDatabase, LocalStorageDatabase, MockLocalDatabase } from './databases/index';
+import { IndexedDBDatabase } from './databases/indexeddb-database';
+import { LocalStorageDatabase } from './databases/localstorage-database';
+import { MockLocalDatabase } from './databases/mock-local-database';
 
 function testGetItem<T>(type: 'primitive' | 'object', localStorage: AsyncLocalStorage, value: T, done: DoneFn) {
 
@@ -117,7 +121,7 @@ function tests(localStorage: AsyncLocalStorage) {
 
       localStorage.removeItem(index).subscribe(() => {
 
-        localStorage.getItem(index).subscribe((data) => {
+        localStorage.getItem<string>(index).subscribe((data) => {
 
           expect(data).toBeNull();
 
@@ -131,13 +135,125 @@ function tests(localStorage: AsyncLocalStorage) {
 
   });
 
+  it('should allow to use operators', (done: DoneFn) => {
+
+    const index = 'index';
+    const value = 'value';
+
+    localStorage.setItem(index, value).subscribe(() => {
+
+      localStorage.getItem<string>(index).map((data) => data).subscribe((data) => {
+
+        expect(data).toBe(value);
+
+        done();
+
+      });
+
+    });
+
+  });
+
+  it('should call complete on setItem', (done: DoneFn) => {
+
+    localStorage.setItem('index', 'value').subscribe({ complete: () => { done(); } });
+
+  });
+
+  it('should call complete on existing getItem', (done: DoneFn) => {
+
+    const index = 'index';
+    const value = 'value';
+
+    localStorage.setItem(index, value).subscribe(() => {
+
+      localStorage.getItem<string>(index).subscribe({ complete: () => { done(); } });
+
+    });
+
+  });
+
+  it('should call complete on unexisting getItem', (done: DoneFn) => {
+
+    localStorage.getItem<string>('notexisting').subscribe({ complete: () => { done(); } });
+
+  });
+
+  it('should call complete on existing removeItem', (done: DoneFn) => {
+
+    const index = 'index';
+
+    localStorage.setItem(index, 'value').subscribe(() => {
+
+      localStorage.removeItem(index).subscribe({ complete: () => { done(); } });
+
+    });
+
+  });
+
+  it('should call complete on unexisting removeItem', (done: DoneFn) => {
+
+    localStorage.removeItem('notexisting').subscribe({ complete: () => { done(); } });
+
+  });
+
+  it('should call complete on clear', (done: DoneFn) => {
+
+    localStorage.clear().subscribe({ complete: () => { done(); } });
+
+  });
+
+  it('should be OK if user manually used first() to complete', (done: DoneFn) => {
+
+    localStorage.clear().first().subscribe({ complete: () => { done(); } });
+
+  });
+
+  it('should be OK if user manually used take(1) to complete', (done: DoneFn) => {
+
+    localStorage.clear().take(1).subscribe({ complete: () => { done(); } });
+
+  });
+
+  it('should be able to update an existing index', (done: DoneFn) => {
+
+    const index = 'index';
+
+    localStorage.setItem(index, 'value').subscribe(() => {
+
+      localStorage.setItem(index, 'updated').subscribe(() => {
+        done();
+      }, () => {
+        fail();
+      });
+
+    });
+
+  });
+
+  it('should work in a Promise-way', (done: DoneFn) => {
+
+    const index = 'index';
+    const value = 'test';
+
+    localStorage.setItem(index, value).toPromise()
+    .then(() => localStorage.getItem(index).toPromise())
+    .then((result) => {
+      expect(result).toBe(value);
+      done();
+    }, () => {
+      fail();
+    });
+
+  });
+
 }
 
 describe('AsyncLocalStorage with mock storage', () => {
 
   let localStorage = new AsyncLocalStorage(new MockLocalDatabase());
 
-    tests(localStorage);
+  tests(localStorage);
 
 });
 
