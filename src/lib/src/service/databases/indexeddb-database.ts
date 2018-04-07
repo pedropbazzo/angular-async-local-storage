@@ -11,10 +11,10 @@ import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
 
-import { AsyncLocalDatabase } from './async-local-database';
+import { LocalDatabase } from './local-database';
 
 @Injectable()
-export class IndexedDBDatabase extends AsyncLocalDatabase {
+export class IndexedDBDatabase extends LocalDatabase {
 
     /**
      * IndexedDB database name for local storage

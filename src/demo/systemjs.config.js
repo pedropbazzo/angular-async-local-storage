@@ -39,7 +39,7 @@
       rxjs: {
         defaultExtension: 'js'
       },
-      'angular-async-local-storage': {
+      '@ngx-pwa/local-storage': {
         main: 'index.js',
         defaultExtension: 'js',
         meta: {

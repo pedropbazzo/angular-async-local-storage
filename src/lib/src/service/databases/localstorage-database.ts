@@ -4,10 +4,10 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
 
-import { AsyncLocalDatabase } from './async-local-database';
+import { LocalDatabase } from './local-database';
 
 @Injectable()
-export class LocalStorageDatabase extends AsyncLocalDatabase {
+export class LocalStorageDatabase extends LocalDatabase {
 
     /* Initializing native localStorage right now to be able to check its support on class instanciation */
     protected localStorage = localStorage;

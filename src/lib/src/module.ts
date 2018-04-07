@@ -1,12 +1,12 @@
 import { NgModule, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-import { AsyncLocalStorage } from './service/lib.service';
-import { AsyncLocalDatabase, IndexedDBDatabase, LocalStorageDatabase, MockLocalDatabase } from './service/databases/index';
+import { LocalStorage } from './service/lib.service';
+import { LocalDatabase, IndexedDBDatabase, LocalStorageDatabase, MockLocalDatabase } from './service/databases/index';
 
 export function asyncLocalStorageFactory(platformId: Object) {
 
-    let database: AsyncLocalDatabase;
+    let database: LocalDatabase;
 
     if (isPlatformBrowser(platformId) && ('indexedDB' in window) && (indexedDB !== undefined) && (indexedDB !== null)) {
 
@@ -25,17 +25,17 @@ export function asyncLocalStorageFactory(platformId: Object) {
 
     }
 
-    return new AsyncLocalStorage(database);
+    return new LocalStorage(database);
 
 };
 
 @NgModule({
     providers: [
         {
-            provide: AsyncLocalStorage,
+            provide: LocalStorage,
             useFactory: asyncLocalStorageFactory,
             deps: [PLATFORM_ID]
         }
     ]
 })
-export class AsyncLocalStorageModule {}
+export class LocalStorageModule {}

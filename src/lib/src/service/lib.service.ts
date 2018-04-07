@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { AsyncLocalDatabase } from './databases/async-local-database';
+import { LocalDatabase } from './databases/local-database';
 
 @Injectable()
-export class AsyncLocalStorage {
+export class LocalStorage {
 
-    protected database: AsyncLocalDatabase;
+    protected database: LocalDatabase;
 
     /**
      * Injects a local database
      */
-    public constructor(database: AsyncLocalDatabase) {
+    public constructor(database: LocalDatabase) {
 
         this.database = database;
 
