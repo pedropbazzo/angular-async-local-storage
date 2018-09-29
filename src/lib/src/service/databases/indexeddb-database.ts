@@ -2,7 +2,7 @@ import { Injectable, Inject, Optional } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
-import { map, mergeMap, first } from 'rxjs/operators';
+import { map, mergeMap, first, tap } from 'rxjs/operators';
 import { fromEvent as observableFromEvent }  from 'rxjs/observable/fromEvent';
 import { of as observableOf }  from 'rxjs/observable/of';
 import { _throw as observableThrow } from 'rxjs/observable/throw';
@@ -65,7 +65,22 @@ export class IndexedDBDatabase extends LocalDatabase {
   getItem<T = any>(key: string) {
 
     /* Opening a trasaction and requesting the item in local storage */
-    return this.transaction().pipe(
+    return this.getItemFromTransaction(key);
+
+  }
+
+  /**
+   * Internal method to factorize the getter for getItem and setItem,
+   * the last one needing to be from a preexisting transaction
+   * @param key The item's key
+   * @param transactionParam Optional pre-existing transaction to use for the read request
+   * @returns The item's value if the key exists, null otherwise, wrapped in an RxJS Observable
+   */
+  private getItemFromTransaction<T = any>(key: string, transactionParam?: IDBObjectStore): Observable<T | null> {
+
+    const transaction$ = transactionParam ? observableOf(transactionParam) : this.transaction();
+
+    return transaction$.pipe(
       map((transaction) => transaction.get(key)),
       mergeMap((request) => {
 
@@ -100,13 +115,18 @@ export class IndexedDBDatabase extends LocalDatabase {
 
     }
 
-    /* Opening a transaction and checking if the item already exists in local storage */
-    return this.getItem(key).pipe(
+    /* Transaction must be the same for read and write, to avoid concurrency issues */
+    const transaction$ = this.transaction('readwrite');
+    let transaction: IDBObjectStore;
+
+    return transaction$.pipe(
+      tap((value) => {
+        transaction = value;
+      }),
+      /* Check if the key already exists or not */
+      mergeMap(() => this.getItemFromTransaction(key, transaction)),
       map((existingData) => (existingData == null) ? 'add' : 'put'),
       mergeMap((method) => {
-
-        /* Opening a transaction */
-        return this.transaction('readwrite').pipe(mergeMap((transaction) => {
 
           let request: IDBRequest;
 
@@ -124,8 +144,6 @@ export class IndexedDBDatabase extends LocalDatabase {
           /* Merging success (passing true) and error events and autoclosing the observable */
           return (observableRace(this.toSuccessObservable(request), this.toErrorObservable(request, `setter`)) as Observable<boolean>)
             .pipe(first());
-
-        }));
 
       }),
       first()
