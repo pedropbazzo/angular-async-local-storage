@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.3.2 (2018-12-12)
+
+### Bug fix
+
+- Correct validation for required vs optional properties (fixes [#63](https://github.com/cyrilletuzi/angular-async-local-storage/issues/63))
+
 ## 5.3.1 (2018-09-29)
 
 ### Bug fix
