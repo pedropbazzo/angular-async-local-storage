@@ -1,33 +1,10 @@
 # Changelog
 
-## 7.0.0-beta.3 (2018-10-16)
+## 5.3.2 & 6.2.1 (2018-12-12)
 
-- Beta support of Angular 7: `npm install @ngx-pwa/local-storage@next`
+### Bug fix
 
-### Feature
-
-- New interfaces for better validation of your JSON schemas:
-  - `JSONSchemaConst`
-  - `JSONSchemaEnum`
-  - `JSONSchemaString`
-  - `JSONSchemaNumeric`
-  - `JSONSchemaBoolean`
-  - `JSONSchemaArray`
-  - `JSONSchemaObject`
-
-See the [full validation guide](https://github.com/cyrilletuzi/angular-async-local-storage/blob/ng7/docs/VALIDATION.md) for more info.
-
-### Breaking change
-
-A [migration guide to version 7](https://github.com/cyrilletuzi/angular-async-local-storage/blob/ng7/docs/MIGRATION_TO_V7.md) is available.
-**Be sure to read it before upgrading**, as v7 introduces an important major change.
-Validation of data is now required when using `getItem()`:
-
-- `getItem<string>('test', { schema: { type: 'string' } })`: no change
-
-- `getItem<string>('test')`: now returns the new TypeScript 3 `unknown` type instead of `any`, requiring from you to check the data manually
-
-Feedback welcome in [#49](https://github.com/cyrilletuzi/angular-async-local-storage/issues/49).
+- Correct validation for required vs optional properties (fixes [#63](https://github.com/cyrilletuzi/angular-async-local-storage/issues/63))
 
 ## 6.1.1 and 5.3.1 (2018-09-29)
 
