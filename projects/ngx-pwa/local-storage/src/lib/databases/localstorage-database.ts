@@ -52,7 +52,11 @@ export class LocalStorageDatabase implements LocalDatabase {
    */
   setItem(key: string, data: any): Observable<boolean> {
 
-    localStorage.setItem(`${this.prefix}${key}`, JSON.stringify(data));
+    if (data !== undefined) {
+
+      localStorage.setItem(`${this.prefix}${key}`, JSON.stringify(data));
+
+    }
 
     return of(true);
 

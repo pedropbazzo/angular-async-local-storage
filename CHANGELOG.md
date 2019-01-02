@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.3.3 & 6.2.2 (2019-01-02)
+
+### Bug fix
+
+- Avoid throwing when storing `undefined` in `localStorage` fallback
+
 ## 5.3.2 & 6.2.1 (2018-12-12)
 
 ### Bug fix
