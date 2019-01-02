@@ -102,6 +102,22 @@ function tests(localStorage: LocalStorage) {
 
   });
 
+  it('should store and return null for undefined too', (done: DoneFn) => {
+
+    localStorage.setItem('test', undefined).subscribe(() => {
+
+      localStorage.getItem('test').subscribe((data) => {
+
+        expect(data).toBe(null);
+
+        done();
+
+      });
+
+    });
+
+  });
+
   it('should store and return an array', (done: DoneFn) => {
 
     testGetItemObject<number[]>(localStorage, [1, 2, 3], done);

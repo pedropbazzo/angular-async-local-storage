@@ -57,7 +57,11 @@ export class LocalStorageDatabase extends LocalDatabase {
    */
   setItem(key: string, data: any) {
 
-    localStorage.setItem(`${this.prefix}${key}`, JSON.stringify(data));
+    if (data !== undefined) {
+
+      localStorage.setItem(`${this.prefix}${key}`, JSON.stringify(data));
+
+    }
 
     return observableOf(true);
 
