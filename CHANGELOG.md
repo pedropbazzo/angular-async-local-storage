@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.3.4 (2019-01-03)
+
+### Bug fix
+
+- `setItem` now works even if something else (native API or another lib) previously stored a value
+
 ## 5.3.3 (2019-01-02)
 
 ### Bug fix

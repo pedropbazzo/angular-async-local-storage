@@ -42,12 +42,6 @@ function testGetItemObject<T>(localStorage: LocalStorage, value: T, done: DoneFn
 
 function tests(localStorage: LocalStorage) {
 
-  beforeEach((done: DoneFn) => {
-    localStorage.clear().subscribe(() => {
-      done();
-    });
-  });
-
   it('should return null on unknown index', (done: DoneFn) => {
 
     localStorage.getItem('unknown').subscribe((data) => {
@@ -490,6 +484,12 @@ describe('LocalStorage with mock storage', () => {
 
   let localStorage = new LocalStorage(new MockLocalDatabase(), new JSONValidator());
 
+  beforeEach((done: DoneFn) => {
+    localStorage.clear().subscribe(() => {
+      done();
+    });
+  });
+
   tests(localStorage);
 
 });
@@ -497,6 +497,12 @@ describe('LocalStorage with mock storage', () => {
 describe('LocalStorage with localStorage', () => {
 
   let localStorage = new LocalStorage(new LocalStorageDatabase(null), new JSONValidator());
+
+  beforeEach((done: DoneFn) => {
+    localStorage.clear().subscribe(() => {
+      done();
+    });
+  });
 
   tests(localStorage);
 
@@ -506,6 +512,12 @@ describe('LocalStorage with localStorage with prefix', () => {
 
   let localStorage = new LocalStorage(new LocalStorageDatabase('myapp'), new JSONValidator());
 
+  beforeEach((done: DoneFn) => {
+    localStorage.clear().subscribe(() => {
+      done();
+    });
+  });
+
   tests(localStorage);
 
 });
@@ -514,13 +526,61 @@ describe('LocalStorage with IndexedDB', () => {
 
   let localStorage = new LocalStorage(new IndexedDBDatabase(), new JSONValidator());
 
+  beforeEach((done: DoneFn) => {
+    localStorage.clear().subscribe(() => {
+      done();
+    });
+  });
+
   tests(localStorage);
+
+  function testSetCompatibilityWithNativeAPI(done: DoneFn, value: any) {
+
+    const index = 'test';
+
+    indexedDB.open('ngStorage').addEventListener('success', (openEvent) => {
+
+      const database = (openEvent.target as IDBRequest).result as IDBDatabase;
+
+      const localStorageObject = database.transaction(['localStorage'], 'readwrite').objectStore('localStorage');
+
+      localStorageObject.add(value, index).addEventListener('success', () => {
+
+        localStorage.setItem(index, 'world').subscribe(() => {
+
+          done();
+
+        });
+
+      });
+
+    });
+
+  }
+
+  const setTestValues = ['hello', '', 0, false, null, undefined];
+
+  for (const setTestValue of setTestValues) {
+
+    it('should store a value on an index previously used by a native or other lib API', (done: DoneFn) => {
+
+      testSetCompatibilityWithNativeAPI(done, setTestValue);
+
+    });
+
+  }
 
 });
 
 describe('LocalStorage with IndexedDB with prefix', () => {
 
   let localStorage = new LocalStorage(new IndexedDBDatabase('myapp'), new JSONValidator());
+
+  beforeEach((done: DoneFn) => {
+    localStorage.clear().subscribe(() => {
+      done();
+    });
+  });
 
   tests(localStorage);
 
@@ -529,6 +589,12 @@ describe('LocalStorage with IndexedDB with prefix', () => {
 describe('AsyncLocalStorage with IndexedDB', () => {
 
   let localStorage = new AsyncLocalStorage(new IndexedDBDatabase(), new JSONValidator());
+
+  beforeEach((done: DoneFn) => {
+    localStorage.clear().subscribe(() => {
+      done();
+    });
+  });
 
   tests(localStorage);
 
