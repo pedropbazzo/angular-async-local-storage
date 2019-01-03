@@ -57,7 +57,7 @@
     "lint": "tslint ./src/**/*.ts -t verbose",
     "release": "standard-version",
     "reinstall": "rimraf node_modules && npm install",
-    "publish": "npm publish dist --tag lts5 --access public"
+    "publish": "npm run build && npm test && npm publish dist --tag lts5 --access public"
   },
   "dependencies": {},
   "peerDependencies": {
