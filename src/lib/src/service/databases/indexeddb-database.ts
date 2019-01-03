@@ -11,10 +11,6 @@ import { race as observableRace }  from 'rxjs/observable/race';
 import { LocalDatabase } from './local-database';
 import { LOCAL_STORAGE_PREFIX } from '../../tokens';
 
-interface IDBObjectStoreV2 extends IDBObjectStore {
-  getKey(key: string): IDBRequest;
-}
-
 @Injectable()
 export class IndexedDBDatabase extends LocalDatabase {
 
@@ -76,17 +72,7 @@ export class IndexedDBDatabase extends LocalDatabase {
         /* Listening to the success event, and passing the item value if found, null otherwise */
         const success = (observableFromEvent(request, 'success') as Observable<Event>).pipe(
           map((event) => (event.target as IDBRequest).result),
-          map((result) => {
-
-            if ((result != null) && (typeof result === 'object') && (this.dataPath in result)) {
-              return (result[this.dataPath] as T);
-            } else if ((result != null)) {
-              return result as T;
-            }
-
-            return null;
-
-          })
+          map((result) => (result && (this.dataPath in result)) ? (result[this.dataPath] as T) : null)
         );
 
         /* Merging success and errors events and autoclosing the observable */
@@ -116,17 +102,17 @@ export class IndexedDBDatabase extends LocalDatabase {
 
     /* Transaction must be the same for read and write, to avoid concurrency issues */
     const transaction$ = this.transaction('readwrite');
-    let transaction: IDBObjectStoreV2;
+    let transaction: IDBObjectStore;
 
     return transaction$.pipe(
       tap((value) => {
-        transaction = value as IDBObjectStoreV2;
+        transaction = value;
       }),
       /* Check if the key already exists or not
        * `getKey()` is only supported in indexedDb v2 (Chrome >= 58)
        * For older browsers, the value is tested instead, but this could lead to an exception
        * if `undefined` was stored by something else (native API or another lib) */
-      map(() => ('getKey' in transaction) ? transaction.getKey(key) : transaction.get(key)),
+      map(() => transaction.get(key)),
       mergeMap((request) => {
 
         /* Listening to the success event, and passing the item value if found, null otherwise */
@@ -139,10 +125,10 @@ export class IndexedDBDatabase extends LocalDatabase {
           .pipe(first());
 
       }),
-      mergeMap((existingKeyOrValue) => {
+      mergeMap((existingValue) => {
 
           /* Adding or updating local storage, based on previous checking */
-          const request: IDBRequest = (existingKeyOrValue === undefined ) ?
+          const request: IDBRequest = (existingValue === undefined ) ?
             transaction.add({ [this.dataPath]: data }, key) :
             transaction.put({ [this.dataPath]: data }, key);
 
