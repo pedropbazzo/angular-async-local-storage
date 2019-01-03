@@ -76,7 +76,17 @@ export class IndexedDBDatabase extends LocalDatabase {
         /* Listening to the success event, and passing the item value if found, null otherwise */
         const success = (observableFromEvent(request, 'success') as Observable<Event>).pipe(
           map((event) => (event.target as IDBRequest).result),
-          map((result) => result && (this.dataPath in result) ? (result[this.dataPath] as T) : null)
+          map((result) => {
+
+            if ((result != null) && (typeof result === 'object') && (this.dataPath in result)) {
+              return (result[this.dataPath] as T);
+            } else if ((result != null)) {
+              return result as T;
+            }
+
+            return null;
+
+          })
         );
 
         /* Merging success and errors events and autoclosing the observable */

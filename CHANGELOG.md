@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.3.5 (2019-01-03)
+
+### Bug fix
+
+- `getItem` now works even if something else (native API or another lib) previously stored a value,
+except if the value stored was `{ value: ... }`
+
 ## 5.3.4 (2019-01-03)
 
 ### Bug fix

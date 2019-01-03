@@ -558,6 +558,32 @@ describe('LocalStorage with IndexedDB', () => {
 
   }
 
+  function testgetCompatibilityWithNativeAPI(done: DoneFn, value: any, schema: JSONSchema) {
+
+    const index = 'test';
+
+    indexedDB.open('ngStorage').addEventListener('success', (openEvent) => {
+
+      const database = (openEvent.target as IDBRequest).result as IDBDatabase;
+
+      const localStorageObject = database.transaction(['localStorage'], 'readwrite').objectStore('localStorage');
+
+      localStorageObject.add(value, index).addEventListener('success', () => {
+
+        localStorage.getItem(index, { schema }).subscribe((result) => {
+
+          expect(result).toEqual((value !== undefined) ? value : null);
+
+          done();
+
+        });
+
+      });
+
+    });
+
+  }
+
   const setTestValues = ['hello', '', 0, false, null, undefined];
 
   for (const setTestValue of setTestValues) {
@@ -565,6 +591,29 @@ describe('LocalStorage with IndexedDB', () => {
     it('should store a value on an index previously used by a native or other lib API', (done: DoneFn) => {
 
       testSetCompatibilityWithNativeAPI(done, setTestValue);
+
+    });
+
+  }
+
+  const getTestValues: [any, JSONSchema][] = [
+    ['hello', { type: 'string' }],
+    ['', { type: 'string' }],
+    [1, { type: 'number' }],
+    [0, { type: 'number' }],
+    [true, { type: 'boolean' }],
+    [false, { type: 'boolean' }],
+    [null, { type: 'null' }],
+    [undefined, { type: 'null' }],
+    [[1, 2, 3], { items: { type: 'number' } }],
+    [{ test: 'value' }, { properties: { test: { type: 'string' } } }],
+  ];
+
+  for (const [getTestValue, getTestSchema] of getTestValues) {
+
+    it('should get a value on an index previously used by a native or other lib API', (done: DoneFn) => {
+
+      testgetCompatibilityWithNativeAPI(done, getTestValue, getTestSchema);
 
     });
 
