@@ -1,11 +1,12 @@
 /**
- * Types allowed in a JSON Schema
+ * Types allowed in a JSON Schema.
+ * Avoid `null` type: it will be removed in v8.
  */
 export type JSONSchemaType = 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'object' | 'null';
 
 /**
  * Subset of the JSON Schema.
- * Types are enforced to validate everything : each value MUST have either 'type' or 'properties' or 'items'.
+ * Types are enforced to validate everything: each value MUST have a `type`.
  * Therefore, unlike the spec, booleans are not allowed as schemas.
  * @see http://json-schema.org/latest/json-schema-validation.html
  * @todo Not all validation features are supported yet : just follow the interface.
@@ -14,8 +15,8 @@ export interface JSONSchema {
 
   /**
    * Type for a primitive value.
-   * Not required for objects, just set 'properties'.
-   * Not required for arrays, just set 'items'.
+   * Always explicit the `type`: it will be required in v8.
+   * Avoid `null` type: it will be removed in v8.
    */
   type?: JSONSchemaType | JSONSchemaType[];
 
@@ -36,11 +37,13 @@ export interface JSONSchema {
   /**
    * Schema for the values of an array.
    * 'type' of values should be a string (not an array of type).
+   * Avoid using an array of JSON schemas: it won't be possible anymore in v8.
    */
   items?: JSONSchema | JSONSchema[];
 
   /**
    * Allow other properties, to not fail with existing JSON schemas.
+   * Avoid this: it won't be possible anymore in v8.
    */
   [k: string]: any;
 
