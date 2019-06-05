@@ -9,22 +9,24 @@ import { LOCAL_STORAGE_PREFIX } from '../tokens';
 
 export function localDatabaseFactory(platformId: Object, prefix: string | null) {
 
-  if (isPlatformBrowser(platformId) && ('indexedDB' in window) && (indexedDB !== undefined) && (indexedDB !== null)) {
+  try {
 
-    /* Try with IndexedDB in modern browsers */
-    return new IndexedDBDatabase(prefix);
+    if (isPlatformBrowser(platformId) && ('indexedDB' in window) && (indexedDB !== undefined) && (indexedDB !== null)) {
 
-  } else if (isPlatformBrowser(platformId) && ('localStorage' in window) && (localStorage !== undefined) && (localStorage !== null)) {
+      /* Try with IndexedDB in modern browsers */
+      return new IndexedDBDatabase(prefix);
 
-    /* Try with localStorage in old browsers (IE9) */
-    return new LocalStorageDatabase(prefix);
+    } else if (isPlatformBrowser(platformId) && ('localStorage' in window) && (localStorage !== undefined) && (localStorage !== null)) {
 
-  } else {
+      /* Try with localStorage in old browsers (IE9) */
+      return new LocalStorageDatabase(prefix);
 
-    /* Fake database for server-side rendering (Universal) */
-    return new MockLocalDatabase();
+    }
 
-  }
+  } catch (error) {}
+
+  /* Fake database for server-side rendering (Universal) */
+  return new MockLocalDatabase();
 
 }
 
