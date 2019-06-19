@@ -4,6 +4,7 @@ import { map, mergeMap, first, tap } from 'rxjs/operators';
 
 import { LocalDatabase } from './local-database';
 import { LocalStorageDatabase } from './localstorage-database';
+import { MockLocalDatabase } from './mock-local-database';
 import { LOCAL_STORAGE_PREFIX } from '../tokens';
 
 @Injectable({
@@ -331,7 +332,32 @@ export class IndexedDBDatabase implements LocalDatabase {
   }
 
   protected setFallback(prefix: string | null): void {
-    this.fallback = new LocalStorageDatabase(prefix);
+
+    /* When storage is fully disabled in browser (via the "Block all cookies" option),
+     * just trying to check `localStorage` variable causes a security exception.
+     * Prevents https://github.com/cyrilletuzi/angular-async-local-storage/issues/118
+     */
+    try {
+
+      if ('getItem' in localStorage) {
+
+        /* Fallback to `localStorage` if available */
+        this.fallback = new LocalStorageDatabase(prefix);
+
+      } else {
+
+        /* Fallback to memory storage otherwise */
+        this.fallback = new MockLocalDatabase();
+
+      }
+
+    } catch {
+
+      /* Fallback to memory storage otherwise */
+      this.fallback = new MockLocalDatabase();
+
+    }
+
   }
 
 }
