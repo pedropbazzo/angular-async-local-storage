@@ -1,4 +1,4 @@
-# Async local storage for Angular
+# Async local storage for Angular 
 
 Efficient client-side storage module for Angular:
 - **simplicity**: simple API like native `localStorage`,
